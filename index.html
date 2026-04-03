@@ -8,9 +8,6 @@
 <meta name="apple-mobile-web-app-title" content="우리가계부"/>
 <meta name="theme-color" id="theme-color-meta" content="#0f172a"/>
 <title>우리 가계부 💴</title>
-<!-- PWA -->
-<link rel="manifest" href="manifest.json"/>
-<link rel="apple-touch-icon" href="apple-touch-icon.png"/>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet"/>
 <style>
 :root{
@@ -1352,7 +1349,7 @@ function kakaoLogin(){
   if(!kk.appKey){alert('카카오 JavaScript 앱 키를 먼저 입력해주세요.\n\ndevelopers.kakao.com에서 앱을 등록한 후 앱 키를 입력해주세요.');return;}
   if(typeof Kakao==='undefined'){
     const s=document.createElement('script');
-    s.src='https://developers.kakaocdn.net/js/kakao.js';
+    s.src='https://t1.kakaocdn.net/kakao_js_sdk/2.7.4/kakao.min.js';
     s.onload=()=>{
       try{
         if(!Kakao.isInitialized())Kakao.init(kk.appKey);
@@ -1436,15 +1433,6 @@ function showToast(msg){const t=document.getElementById('toast');t.textContent=m
 // ── INIT ──────────────────────────────────────────────────────────────────────
 loadTheme();
 renderAll();
-
-// ── SERVICE WORKER (PWA 오프라인 지원) ────────────────────────────────────────
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js')
-      .then(reg => console.log('SW 등록됨:', reg.scope))
-      .catch(err => console.warn('SW 등록 실패:', err));
-  });
-}
 </script>
 </body>
 </html>
