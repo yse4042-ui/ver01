@@ -1349,7 +1349,7 @@ function kakaoLogin(){
   if(!kk.appKey){alert('카카오 JavaScript 앱 키를 먼저 입력해주세요.\n\ndevelopers.kakao.com에서 앱을 등록한 후 앱 키를 입력해주세요.');return;}
   function initAndLogin(){
     try{
-      if(Kakao.isInitialized())Kakao.cleanup();
+      try{if(Kakao.isInitialized()&&Kakao.cleanup)Kakao.cleanup();}catch(ex){}
       Kakao.init(kk.appKey);
       Kakao.Auth.login({
         throughTalk:false,
@@ -1365,7 +1365,7 @@ function kakaoLogin(){
   }
   if(typeof Kakao==='undefined'){
     const s=document.createElement('script');
-    s.src='https://t1.kakaocdn.net/kakao_js_sdk/2.7.4/kakao.min.js';
+    s.src='https://t1.kakaocdn.net/kakao_js_sdk/2.1.0/kakao.min.js';
     s.onload=initAndLogin;
     s.onerror=()=>showToast('카카오 SDK 로드 실패');
     document.head.appendChild(s);
