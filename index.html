@@ -290,6 +290,11 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
         <div class="ann-sum-item"><div class="ann-sum-label">총 대출상환</div><div class="ann-sum-val" id="ann-total-loan" style="color:var(--blue)"></div></div>
         <div class="ann-sum-item"><div class="ann-sum-label">연간 잔여</div><div class="ann-sum-val" id="ann-total-bal"></div></div>
       </div>
+      <!-- 적금 연간 요약 -->
+      <div style="background:linear-gradient(135deg,#0a2010,#0e3a1a);border:1px solid var(--green-border);border-radius:12px;padding:14px;margin-bottom:4px">
+        <div style="font-size:11px;color:#4ade80;margin-bottom:10px;font-weight:600">🏦 연간 적금 현황</div>
+        <div id="ann-sav-summary" style="display:grid;grid-template-columns:1fr 1fr;gap:10px"></div>
+      </div>
       <div style="background:var(--card2);border-radius:12px;padding:14px;border:1px solid var(--blue-border);margin-bottom:4px">
         <div style="font-size:11px;color:var(--blue);margin-bottom:10px;font-weight:600">🏛️ 연간 대출 상환 현황</div>
         <div id="ann-loan-summary" style="display:grid;grid-template-columns:1fr 1fr;gap:10px"></div>
@@ -962,6 +967,60 @@ function renderAnnual(){
   const balEl2=document.getElementById('ann-total-bal');
   balEl2.textContent=(bal>=0?'+':'')+fmt(bal);
   balEl2.style.color=bal>=0?'var(--green)':'var(--red)';
+
+  // 적금 연간 현황
+  const savConfigs=ls('saving-configs')||getDefaultSavingConfigs();
+  const annSavEl=document.getElementById('ann-sav-summary');
+  if(annSavEl){
+    let totalAnnSav=0;
+    const savDetails=savConfigs.map(cfg=>{
+      // 해당 연도 납입 총액 계산
+      let yearSav=0;
+      for(let m=1;m<=cutoff;m++){
+        const monthly=getSavingCumulative(cfg,annualYear,m)-getSavingCumulative(cfg,annualYear,m-1>0?m-1:0);
+        yearSav+=Math.max(0,monthly);
+      }
+      // 더 간단한 방법: 해당 연도에 납입한 달 수 * 월납입액
+      if(cfg.startDate){
+        const[sy,sm]=cfg.startDate.split('-').map(Number);
+        let ey=annualYear,em=cutoff;
+        if(cfg.endDate){const[a,b]=cfg.endDate.split('-').map(Number);if(a<annualYear||(a===annualYear&&b<cutoff)){ey=a;em=b;}}
+        const startM=(sy<annualYear)?1:(sy===annualYear?sm:13);
+        const endM=(ey>annualYear)?cutoff:(ey===annualYear?em:0);
+        const months=Math.max(0,endM-startM+1);
+        yearSav=months*num(cfg.monthlyAmount);
+      }
+      totalAnnSav+=yearSav;
+      return {name:cfg.name,yearSav,cumul:getSavingCumulative(cfg,annualYear,cutoff)};
+    });
+    const si_total=savConfigs.reduce((a,cfg)=>a+calcSavingInterest(cfg),0);
+    const tax_total=savConfigs.reduce((a,cfg)=>{
+      const si=calcSavingInterest(cfg);
+      return a+Math.round(si*numf(cfg.taxRate!=null?cfg.taxRate:15.4)/100);
+    },0);
+    const afterTax_total=si_total-tax_total;
+    const totalCumul=savConfigs.reduce((a,cfg)=>a+getSavingCumulative(cfg,annualYear,cutoff),0);
+    annSavEl.innerHTML=
+      '<div style="background:rgba(52,211,153,.08);border-radius:8px;padding:10px;border:1px solid var(--green-border)">'+
+      '<div style="font-size:10px;color:var(--text4);margin-bottom:3px">'+annualYear+'년 납입 총액</div>'+
+      '<div style="font-size:15px;font-weight:700;color:#34d399">'+fmt(totalAnnSav)+'</div></div>'+
+      '<div style="background:rgba(52,211,153,.08);border-radius:8px;padding:10px;border:1px solid var(--green-border)">'+
+      '<div style="font-size:10px;color:var(--text4);margin-bottom:3px">누적 원금 합계</div>'+
+      '<div style="font-size:15px;font-weight:700;color:#6ee7b7">'+fmt(totalCumul)+'</div></div>'+
+      (si_total>0?
+      '<div style="background:rgba(52,211,153,.08);border-radius:8px;padding:10px;border:1px solid var(--green-border)">'+
+      '<div style="font-size:10px;color:var(--text4);margin-bottom:3px">예상 세후 이자</div>'+
+      '<div style="font-size:15px;font-weight:700;color:#4ade80">+'+fmt(afterTax_total)+'</div></div>'+
+      '<div style="background:rgba(52,211,153,.08);border-radius:8px;padding:10px;border:1px solid var(--green-border)">'+
+      '<div style="font-size:10px;color:var(--text4);margin-bottom:3px">세후 만기 수령액</div>'+
+      '<div style="font-size:15px;font-weight:700;color:var(--green)">'+fmt(totalCumul+afterTax_total)+'</div></div>'
+      :'<div style="font-size:11px;color:var(--text4);grid-column:1/-1;padding:4px 0">※ 금리 입력 시 이자 예상액이 표시됩니다</div>')+
+      (savDetails.length>0?'<div style="grid-column:1/-1;margin-top:4px">'+savDetails.filter(d=>d.yearSav>0||d.cumul>0).map(d=>
+        '<div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-top:1px solid var(--green-border)">'+
+        '<span style="color:#4ade80">'+d.name+'</span>'+
+        '<span style="color:var(--green);font-weight:600">'+fmt(d.cumul)+' 누적</span></div>'
+      ).join('')+'</div>':'');
+  }
 
   // 대출 연간 현황 + 수입대비 %
   const annLoanEl=document.getElementById('ann-loan-summary');
