@@ -339,7 +339,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
       <div class="field"><label>실수령액 (원)</label><input type="number" id="i-me" placeholder="0" oninput="saveIncome()"/></div>
       <div class="field"><label>비고</label><input type="text" id="i-me-note" placeholder="메모..." oninput="saveIncome()"/></div>
       <div id="slip-me-wrap"></div>
-      <input type="file" id="slip-me-file" accept="image/*" capture="environment" style="display:none" onchange="handleSlipFile('me',this)"/>
+      <input type="file" id="slip-me-file" accept="image/*" style="display:none" onchange="handleSlipFile('me',this)"/>
       <button class="action-btn" style="margin-bottom:0;font-size:13px" onclick="document.getElementById('slip-me-file').click()">📎 급여명세서 첨부</button>
     </div>
   </div>
@@ -349,7 +349,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
       <div class="field"><label>실수령액 (원)</label><input type="number" id="i-sp" placeholder="0" oninput="saveIncome()"/></div>
       <div class="field"><label>비고</label><input type="text" id="i-sp-note" placeholder="메모..." oninput="saveIncome()"/></div>
       <div id="slip-sp-wrap"></div>
-      <input type="file" id="slip-sp-file" accept="image/*" capture="environment" style="display:none" onchange="handleSlipFile('sp',this)"/>
+      <input type="file" id="slip-sp-file" accept="image/*" style="display:none" onchange="handleSlipFile('sp',this)"/>
       <button class="action-btn" style="margin-bottom:0;font-size:13px" onclick="document.getElementById('slip-sp-file').click()">📎 급여명세서 첨부</button>
     </div>
   </div>
@@ -359,7 +359,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
       <div class="field"><label>금액 (원)</label><input type="number" id="i-extra" placeholder="0" oninput="saveIncome()"/></div>
       <div class="field"><label>메모</label><input type="text" id="i-extra-note" placeholder="당직수당 등..." oninput="saveIncome()"/></div>
       <div id="slip-extra-wrap"></div>
-      <input type="file" id="slip-extra-file" accept="image/*" capture="environment" style="display:none" onchange="handleSlipFile('extra',this)"/>
+      <input type="file" id="slip-extra-file" accept="image/*" style="display:none" onchange="handleSlipFile('extra',this)"/>
       <button class="action-btn" style="margin-bottom:0;font-size:13px" onclick="document.getElementById('slip-extra-file').click()">📎 영수증 / 증빙 첨부</button>
     </div>
   </div>
